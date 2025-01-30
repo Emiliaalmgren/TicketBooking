@@ -1,14 +1,22 @@
 using System.ComponentModel.DataAnnotations;
 using Moq;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
 namespace TicketBookingCore.Tests
 {
     public class TicketBookingRequestProcessorTests
     {
+        private readonly TicketBookingRequest _request;
         private readonly Mock<ITicketBookingRepository> _ticketBookingRepositoryMock;
         private readonly TicketBookingRequestProcessor _processor;
         public TicketBookingRequestProcessorTests()
         {
+            _request = new TicketBookingRequest
+            {
+                FirstName = "Emilia",
+                LastName = "Almgren",
+                Email = "emilia@hotmail.com"
+            };
             _ticketBookingRepositoryMock = new Mock<ITicketBookingRepository> ();
             _processor = new TicketBookingRequestProcessor(_ticketBookingRepositoryMock.Object);
         }
@@ -38,7 +46,7 @@ namespace TicketBookingCore.Tests
         public void ShouldThrowExceptionIfRequestIsNull()
         {
             //Arrange
-            
+            //Lagt i konstruktor
 
             //Act
             var exception = Assert.Throws<ArgumentNullException>(() => _processor.Book(null));
@@ -58,23 +66,19 @@ namespace TicketBookingCore.Tests
                     savedTicketBooking = ticketBooking;
                 });
 
-            var request = new TicketBookingRequest
-            {
-                FirstName = "Emilia",
-                LastName = "Almgren",
-                Email = "emilia@hotmail.com"
-            };
-
             //Act
 
-            TicketBookingResponse response = _processor.Book(request);
+            _processor.Book(_request);
 
             //Assert
 
+            //Verify that the Save method was called once
+            _ticketBookingRepositoryMock.Verify(x => x.Save(It.IsAny<TicketBooking>()), Times.Once);
+
             Assert.NotNull(savedTicketBooking);
-            Assert.Equal(request.FirstName, savedTicketBooking.FirstName);
-            Assert.Equal(request.LastName, savedTicketBooking.LastName);
-            Assert.Equal(request.Email, savedTicketBooking.Email);
+            Assert.Equal(_request.FirstName, savedTicketBooking.FirstName);
+            Assert.Equal(_request.LastName, savedTicketBooking.LastName);
+            Assert.Equal(_request.Email, savedTicketBooking.Email);
         }
     }
 }
