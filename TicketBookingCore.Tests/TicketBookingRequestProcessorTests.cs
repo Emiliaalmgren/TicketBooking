@@ -43,5 +43,24 @@ namespace TicketBookingCore.Tests
             //Assert
             Assert.Equal("request", exception.ParamName);
         }
+        [Fact]
+        public void ShouldSaveToDataBase()
+        {
+            //Arrange
+            var request = new TicketBookingRequest
+            {
+                FirstName = "Emilia",
+                LastName = "Almgren",
+                Email = "emilia@hotmail.com"
+            };
+
+            //Act
+
+            var response = _processor.Book(request);
+
+            //Assert
+
+
+        }
     }
 }
